@@ -1,0 +1,74 @@
+server:
+  port: 8088
+
+---
+
+spring:
+  profiles: default
+  cloud:
+    gateway:
+      routes:
+        - id: member
+          uri: http://localhost:8081
+          predicates:
+            - Path=/members/** 
+        - id: message
+          uri: http://localhost:8082
+          predicates:
+            - Path=/messages/** 
+        - id: point
+          uri: http://localhost:8083
+          predicates:
+            - Path=/points/** 
+        - id: mypage
+          uri: http://localhost:8084
+          predicates:
+            - Path= /mypages/**
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "*"
+            allowedMethods:
+              - "*"
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+
+
+---
+
+spring:
+  profiles: docker
+  cloud:
+    gateway:
+      routes:
+        - id: member
+          uri: http://member:8080
+          predicates:
+            - Path=/members/** 
+        - id: message
+          uri: http://message:8080
+          predicates:
+            - Path=/messages/** 
+        - id: point
+          uri: http://point:8080
+          predicates:
+            - Path=/points/** 
+        - id: mypage
+          uri: http://mypage:8080
+          predicates:
+            - Path= /mypages/**
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "*"
+            allowedMethods:
+              - "*"
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+
+server:
+  port: 8080
