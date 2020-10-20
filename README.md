@@ -700,3 +700,60 @@ Concurrency:		       96.02
 ```
 
 배포기간 동안 Availability 가 변화없기 때문에 무정지 재배포가 성공한 것으로 확인됨.
+
+
+
+
+
+
+
+
+＃ 1.서비스 정상가입 -> 2.포인트 적립 -> 3.포인트 사용 -> 4.회원 탈퇴
+1) 서비스 신규 가입
+http POST http://localhost:8081/members phoneNo=01085581234 nickname=SEQ1 memberStatus=READY memberId=1
+http GET http://localhost:8081/members/1
+http GET http://localhost:8083/points/1
+
+2) 포인트 사용 - remainPoint:1530
+http PATCH http://localhost:8083/points/1 requirePoint=530   
+
+3) 포인트 사용 - remainPoint:800 
+http PATCH http://localhost:8083/points/1 requirePoint=-730
+
+4) 회원 탈퇴
+http DELETE http://localhost:8081/members/1
+http GET http://localhost:8081/members/1  -- 404 에러
+http GET http://localhost:8083/points/1   -- 404 에러
+
+
+＃ 1.서비스 비정상 가입 -> 포인트 적립(불가) -> 포인트 사용(불가) -> 회원 탈퇴
+1) 서비스 비정상 신규가입 - remainPoint:0
+http POST http://localhost:8081/members phoneNo=0108558 nickname=SEQ2 memberStatus=READY memberId=2
+http GET http://localhost:8081/members/2
+http GET http://localhost:8083/points/2
+
+2) 포인트 사용 - remainPoint:0
+http PATCH http://localhost:8083/points/2 requirePoint=100
+
+3) 포인트 사용 - remainPoint:0
+http PATCH http://localhost:8083/points/2 requirePoint=-50
+
+4) 회원 탈퇴
+http DELETE http://localhost:8081/members/2
+http GET http://localhost:8081/members/2    -- 404 에러
+http GET http://localhost:8083/points/2     -- 404 에러
+
+
+＃ 1.서비스 가입 -> 마이페이지 정보 확인 -> 포인트 사용 -> 마이페이지 확인
+1) 서비스 신규 가입
+http POST http://localhost:8081/members phoneNo=01011223344 nickname=SEQ4 memberStatus=READY memberId=3
+
+2) 마이페이지 정보 확인 - remainPoint:1000
+http GET http://localhost:8084/mypages/3
+
+3) 포인트 사용 - remainPoint:1500
+http PATCH http://localhost:8083/points/3 requirePoint=500
+
+4) 마이페이지 정보 확인 - remainPoint:1500
+http GET http://localhost:8084/mypages/3
+
